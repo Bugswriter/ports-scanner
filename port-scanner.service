@@ -1,0 +1,14 @@
+[Unit]
+Description=Port Scanner Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/ports-scanner/env/bin/python /root/ports-scanner/main.py
+WorkingDirectory=/root/ports-scanner
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

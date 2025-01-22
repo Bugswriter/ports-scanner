@@ -67,7 +67,7 @@ def main():
                     for port, state in open_ports:
                         logging.warning(f"Threat detected: {address} - Port {port}: {state}")
 
-                    message = f"Open ports detected on {address}:\n"
+                    message = f"@channel, Open ports detected on {address}:\n"
                     message += "\n".join([f" - Port {port}: {state}" for port, state in open_ports])
                     send_slack_notification(slack_webhook, message)
 
