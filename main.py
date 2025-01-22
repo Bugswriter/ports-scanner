@@ -38,15 +38,19 @@ def scan_target(nm, target, whitelisted_ports):
     try:
         nm.scan(hosts=target, arguments="-T4 -sT --open")  # TCP connect scan
         open_ports = []
-        if target in nm.all_hosts():
-            for port in nm[target]['tcp']:
-                if port not in whitelisted_ports:
-                    open_ports.append((port, nm[target]['tcp'][port]['state']))
+        
+        # Ensure we check all hosts returned by the scanner
+        for host in nm.all_hosts():
+            logging.info(f"Scanned host: {host} ({nm[host].hostname()})")
+            
+            if 'tcp' in nm[host]:
+                for port in nm[host]['tcp']:
+                    if port not in whitelisted_ports:
+                        open_ports.append((port, nm[host]['tcp'][port]['state']))
         return open_ports
     except Exception as e:
         logging.error(f"Error scanning {target}: {e}")
         return []
-
 
 def main():
     config = load_config("config.yaml")
@@ -67,7 +71,7 @@ def main():
                     for port, state in open_ports:
                         logging.warning(f"Threat detected: {address} - Port {port}: {state}")
 
-                    message = f"@channel, Open ports detected on {address}:\n"
+                    message = f"<!channel>, *Open ports detected* on {address}:\n"
                     message += "\n".join([f" - Port {port}: {state}" for port, state in open_ports])
                     send_slack_notification(slack_webhook, message)
 
